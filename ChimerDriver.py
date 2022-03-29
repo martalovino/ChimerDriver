@@ -270,9 +270,49 @@ if __name__ == '__main__':
             print('%d feat tot\n%d GO\n%d miRNA\n%d TF\n%d initial features' %(len(features_selected),num_GO,num_miRNA,num_TF,num_init))
 
     elif action == 'load_test_model':
+        folder_name,filename_dataset = sys.argv[2],sys.argv[3]
+        whichset = 'test'
+        label_dataset = 'N'
+        filename_out = filename_dataset[:-4].split('.')[-1] # preso tutto il nome esclusa l'estensione e selezionato l'ultima stringa dopo il punto
+        filename_base = filename_out.split('/')[-1] #prendo solo il nome base senza la cartella di provenienza
+        
+        # create folder if it doesn't exist
+        Path(folder_name+"/").mkdir(parents=True, exist_ok=True)
+        
+        
+        ########## CREATING STRUCTURAL FEATURES ###########
+        print('Creating structural features...')
+        IF = initial_features(filename_dataset)
+        IF.obtaining_partial_features(label_dataset,folder_name+"/"+filename_base+'_structfeat.csv')
+
+        ######### CREATING FEATURES TRANSCRIPTION FACTORS ###########
+        print('Creating transcription factor features...')
+        TF = Transcription_factors_features(folder_name+"/"+filename_base+'_structfeat.csv')
+        TF.build_TF_features(folder_name+"/"+filename_base+'_TF.csv')
+        #######################################   
+       
+        ######### CREATING FEATURES GENE ONTOLOGIES ########### already saved 'GO_oncofuse_testset_usando_solo_train.csv' already saved
+        # the GOs found in the training set will be the ones used for the rest of the sets
+        print('Creating gene ontology features...')
+        GO = Gene_ontologies_features(folder_name+"/"+filename_base+'_structfeat.csv', whichset)
+        num_GOs = GO.build_GO_features(folder_name+"/"+filename_base+'_GO.csv')
+        #######################################
+
+
+        ######### CREATING FEATURES miRNA ########### already saved "gene_miRNA_matrix_oncofuse_trset"
+        print('Creating microRNA features...')
+        miRNA = miRNA_features(folder_name+"/"+filename_base+'_structfeat.csv')
+        num_miRNA = miRNA.build_miRNA_features(folder_name+"/"+filename_base+'_miRNA.csv')
+        #######################################
+    
+    
+    
+    
 
         # LOADING & TESTING
-        folder_name, test_filename, feature_selected_to_load_filename, model_to_load_filename = sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5]
+        test_filename = sys.argv[3]
+        feature_selected_to_load_filename = os.path.join(folder_name, 'feat_selall.txt')
+        model_to_load_filename = 'best_model.h5'
         features_selected = []
         with open(feature_selected_to_load_filename,"r") as f:
             for row in f:
