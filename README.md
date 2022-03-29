@@ -60,7 +60,7 @@ conda activate ChimerDriver
 ```
 Then **clone this repository**, unzip _processed_db.zip_ file and install all the required packages listed in the _requirements.txt_ file.  
 ```
-git clone https://github.com/veneresabrina/ChimerDriver.git
+git clone https://github.com/martalovino/ChimerDriver.git
 cd ChimerDriver
 unzip processed_db.zip
 python -m pip install --upgrade pip           # ensure you have the last version of pip
